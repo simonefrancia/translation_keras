@@ -1,0 +1,48 @@
+FROM tensorflow/tensorflow:latest-gpu
+
+
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    wget \
+    vim \
+    apt-utils \
+    nano \
+    unzip \
+    python-pip python-dev \
+    python-tk
+
+RUN apt-get update && apt-get install build-essential -y && ldconfig
+
+RUN pip install --upgrade pip
+
+COPY script/ script/
+COPY src/ src/
+
+
+RUN apt-get install -y npm
+RUN npm install n -g
+RUN n lts
+RUN npm install -g yarn
+
+RUN mkdir dataset
+RUN chmod 755 ./script/download.sh && ./script/download.sh && mv *.zip dataset
+RUN cd dataset && unzip -o \*.zip && rm _about.txt && rm *.zip
+
+RUN \
+    pip install keras && \
+    pip install tensorflowjs && \
+    pip install IPython && \
+    python -m pip install -U matplotlib &&  \
+    pip install tensorflow-gpu
+
+EXPOSE $PORT
+
+WORKDIR src
+
+
+
+
+
+
+
